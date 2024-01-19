@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hello WebSocket</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+    <script src="/app.js"></script>
+</head>
+<body>
+<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
+    enabled. Please enable
+    Javascript and reload this page!</h2></noscript>
+
+<div id="main-content" class="container">
+    <div class="row">
+        <div class="col-1">
+            <button id="disconnect" class="btn btn-default" onclick="disconnect()" disabled="disabled">Disconnect
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <h1>Калькулятор матрицы</h1>
+            <h4>В ячейки таблицы необходимо ввести числа. В случае пропуска ввода либо ввод символа отличного от числа,
+                значение будет приравнено 0 (нулю).</h4>
+            <h4>В правом крайнем столбце значения вектора В</h4>
+        </div>
+    </div>
+
+    <div id="matrix"></div>
+    <div>
+        <form name="f1">
+            Укажите порядок квадратной матрицы
+            N * N = <select name="N_select" id="N_select"></select>
+            <input type="button" value="New" onclick="create()">
+        </form>
+    </div>
+    <br/>
+    <div class="col">
+        <button id="calculate" onclick="calculate()">Рассчитать</button>
+    </div>
+    <br/>
+    <div class="col">
+        <button id="matrixDetails" onclick="getMatrixDetails()">Получить результат</button>
+    </div>
+    <br/>
+    <table id="resultTable" style="border: 1px solid #900;">
+        <tbody>
+        <tr style="border: 1px solid #900;">
+            <td>Определитель матрицы</td>
+            <td>
+                <p id="det"></p>
+            </td>
+        </tr>
+        <tr style="border: 1px solid #900;">
+            <td>Обратная матрица</td>
+            <td>
+                <p id="reverse"></p>
+            </td>
+        </tr>
+        <tr style="border: 1px solid #900;">
+            <td>Транспонирование матрицы</td>
+            <td>
+                <p id="transpose"></p>
+            </td>
+        </tr>
+        <tr style="border: 1px solid #900;">
+            <td>Решение СЛАУ с помощью LU-разложения</td>
+            <td>
+                <p id="decomposition"></p>
+            </td>
+        </tbody>
+    </table>
+</div>
+
+<script>
+ function DynamicTable (N,tableId) { //Объект Динамическая таблица
+  this.N = N;
+  var tableDiv;
+
+  this.table = function() { //Формирование таблицы в элементе tableId
+   tableDiv = document.getElementById(tableId);
+   var tbl = document.createElement('matrix');
+   tbl.setAttribute('align', 'center');
+   tbl.setAttribute('border', '1');
+   var tbdy = document.createElement('tbody');
+   for (var i = 1; i <= N; i++) {
+    var tr = document.createElement('tr');
+    for (var j = 1; j <= N+1; j++) {
+     var td = document.createElement('td');
+     var inp = document.createElement('input');
+     inp.setAttribute('type', 'input');
+     inp.setAttribute('size', '9'); //видимый размер
+     inp.setAttribute('maxlength', '8'); //макс.длина ввода
+     inp.setAttribute('id', 'c'+i+''+j); //inp.id = "";
+     inp.setAttribute('name', 'c'+i+''+j);
+     td.appendChild(inp);
+     tr.appendChild(td);
+    }
+    tbdy.appendChild(tr);
+   }
+   tbl.appendChild(tbdy);
+   tableDiv.appendChild (tbl);
+  }
+
+  this.erase = function () { //Удалить старую таблицу
+   while (tableDiv.firstChild) {
+    tableDiv.removeChild (tableDiv.firstChild);
+   }
+  }
+ }
+
+ var task; //Объект таблицы
+
+ function create() { //По кнопке New создать новую таблицу нужного размера
+  var n = parseInt (document.f1.N_select.value);
+  if (isNaN(n)) {
+   n = 3;
+   document.f1.N_select.value = n;
+  }
+
+  task.erase();
+  task = new DynamicTable (n,'matrix');
+  task.table();
+ }
+
+ function putLists (low,hi,def) { //Получить списки значений для размерностей таблицы
+  var s = '';
+  for (var i = low; i<= hi; i++) s += '<option value="'+i+'"'+
+   (i==def?' selected':'')+'>'+i+"\n";
+  document.getElementById('N_select').innerHTML = s;
+
+ }
+
+ window.addEventListener('load', function (e) {
+  //По загрузке страницы создать объекты по умолчанию
+  putLists (2,9,3);
+  task = new DynamicTable(3,'matrix');
+  task.table();
+ }, false);
+
+</script>
+</body>
+</html>
