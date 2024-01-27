@@ -1,6 +1,6 @@
-package ru.matrix.creator.util;
+package matrix.creator.util;
 
-import ru.matrix.creator.MatrixDetailCreatorException;
+import matrix.creator.MatrixDetailCreatorException;
 
 public class MatrixReverseUtil {
     private MatrixReverseUtil() {

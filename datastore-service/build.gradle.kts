@@ -6,4 +6,6 @@ dependencies {
     implementation("org.flywaydb:flyway-core")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
+
+    implementation("com.google.code.findbugs:jsr305:3.0.2")
 }

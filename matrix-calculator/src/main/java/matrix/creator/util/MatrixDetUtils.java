@@ -1,4 +1,4 @@
-package ru.matrix.creator.util;
+package matrix.creator.util;
 
 public class MatrixDetUtils {
     private MatrixDetUtils() {

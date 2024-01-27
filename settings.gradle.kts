@@ -12,3 +12,4 @@ pluginManagement {
 }
 include("client-service")
 include("datastore-service")
+include("matrix-calculator")

@@ -15,7 +15,6 @@ import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import org.springframework.web.util.HtmlUtils;
 import reactor.core.publisher.Mono;
 import ru.matrix.domain.Matrix;
-import ru.matrix.creator.MatrixCreate;
 
 
 @Controller
@@ -41,19 +40,24 @@ public class MatrixController {
         }
 
         try {
-            Matrix matrixDto = new MatrixCreate().getMatrixDetail(strMatrix);
 
-            saveMatrixDetail(strMatrix, matrixDto)
-                    .subscribe(matrixId -> logger.info("matrix send id:{}", matrixId));
+            saveMatrixDetail(strMatrix)
+                    .subscribe(matrix -> template.convertAndSend(String.format("%s%s", TOPIC_TEMPLATE, strMatrix),  new Matrix(
+                            HtmlUtils.htmlEscape(matrix.strMatrix()),
+                            HtmlUtils.htmlEscape(matrix.det()),
+                            HtmlUtils.htmlEscape(matrix.reverse()),
+                            HtmlUtils.htmlEscape(matrix.transpose()),
+                            HtmlUtils.htmlEscape(matrix.decomposition())
+                    )));
 
-            template.convertAndSend(String.format("%s%s", TOPIC_TEMPLATE, strMatrix),
-                    new Matrix(
-                            HtmlUtils.htmlEscape(matrixDto.strMatrix()),
-                            HtmlUtils.htmlEscape(matrixDto.det()),
-                            HtmlUtils.htmlEscape(matrixDto.reverse()),
-                            HtmlUtils.htmlEscape(matrixDto.transpose()),
-                            HtmlUtils.htmlEscape(matrixDto.decomposition())
-                    ));
+//            template.convertAndSend(String.format("%s%s", TOPIC_TEMPLATE, strMatrix),
+//                    new Matrix(
+//                            HtmlUtils.htmlEscape(matrixDto.strMatrix()),
+//                            HtmlUtils.htmlEscape(matrixDto.det()),
+//                            HtmlUtils.htmlEscape(matrixDto.reverse()),
+//                            HtmlUtils.htmlEscape(matrixDto.transpose()),
+//                            HtmlUtils.htmlEscape(matrixDto.decomposition())
+//                    ));
         } catch (Exception e) {
             logger.error(e.getMessage());
             throw new MatrixDetailException(e.getMessage());
@@ -77,11 +81,10 @@ public class MatrixController {
                 .subscribe(matrix -> template.convertAndSend(simpDestination, matrix));
     }
 
-    private Mono<Long> saveMatrixDetail(String strMatrix, Matrix matrix) {
+    private Mono<Matrix> saveMatrixDetail(String strMatrix) {
         return datastoreClient.post().uri(String.format("/matrix/%s", strMatrix))
                 .accept(MediaType.APPLICATION_JSON)
-                .bodyValue(matrix)
-                .exchangeToMono(response -> response.bodyToMono(Long.class));
+                .exchangeToMono(response -> response.bodyToMono(Matrix.class));
     }
 
     private Mono<Matrix> getMatrixDetailByStrMatrix(String strMatrix) {

@@ -1,17 +1,16 @@
-package ru.matrix.creator;
+package matrix.creator;
 
+import matrix.creator.util.*;
+import matrix.domain.Matrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.matrix.controllers.MatrixController;
-import ru.matrix.creator.util.*;
-import ru.matrix.domain.Matrix;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class MatrixCreate {
+public class MatrixCreateServiceImpl implements MatrixCreateService {
 
-    private static final Logger logger = LoggerFactory.getLogger(MatrixController.class);
+    private static final Logger logger = LoggerFactory.getLogger(MatrixCreateServiceImpl.class);
 
     private static final String DET = "det";
     private static final String REVERSE = "reverse";
@@ -19,9 +18,10 @@ public class MatrixCreate {
     private static final String DECOMPOSITION = "decomposition";
     private static final String EMPTY_STRING = "";
 
-    public MatrixCreate() {
+    public MatrixCreateServiceImpl() {
     }
 
+    @Override
     public Matrix getMatrixDetail(String strMatrix) throws MatrixDetailCreatorException {
         Map<String, Object> objectMap = new HashMap<>();
         getMapMatrixDetail(strMatrix, objectMap);
